@@ -1,42 +1,44 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			contacts: [],
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			
+			getContacts: () => {
+				console.log("getcontacts")
+				fetch("https://playground.4geeks.com/contact/agendas/santiagoe16/contacts")
+				.then((response) => response.json())
+				.then((data) =>  setStore({contacts: data.contacts}))
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+
+			deleteContact: (id) => {
+				fetch(`https://playground.4geeks.com/contact/agendas/santiagoe16/contacts/${id}`,
+					{
+						method: 'DELETE',
+						redirect:"follow"
+					}
+				)
+				.then( ()=> getActions().getContacts())
+				console.log(id+" eliminado")
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+			submitForm: (formData)=>{
+				fetch("https://playground.4geeks.com/contact/agendas/santiagoe16/contacts",{
+					method: "POST",
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(formData)
+				})
+				.then(() => getActions().getContacts())
+			},
 
-				//reset the global store
-				setStore({ demo: demo });
+			editContac: (id,formData) => {
+				fetch(`https://playground.4geeks.com/contact/agendas/santiagoe16/contacts/${id}`,{
+					method: "PUT",
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(formData)
+				})
+				.then(() => getActions().getContacts())
 			}
 		}
 	};

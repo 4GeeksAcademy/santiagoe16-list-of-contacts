@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Form, Link, useLocation } from "react-router-dom";
 
 import { Context } from "../store/appContext";
 
@@ -7,37 +7,70 @@ import "../../styles/demo.css";
 
 export const Demo = () => {
 	const { store, actions } = useContext(Context);
+	const location = useLocation();
+    const { contactId } = location.state || {};
+    console.log(contactId);
+	const [formData, setFormData] = useState({
+		name: "",
+		address: "",
+		phone: "",
+		email: ""
+	})
+
+	const handleChange = (e)=>{
+		const { name, value } = e.target;
+
+		setFormData({...formData,
+			[name]: value
+		})
+	}
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		console.log(contactId);
+		
+		if(contactId == undefined){
+			actions.submitForm(formData);
+		}
+		else{
+			actions.editContac(contactId,formData)
+		}
+		setFormData({
+			name: "",
+			address: "",
+			phone: "",
+			email: ""
+		})
+	};
 
 	return (
 		<div className="container">
-			<ul className="list-group">
-				{store.demo.map((item, index) => {
-					return (
-						<li
-							key={index}
-							className="list-group-item d-flex justify-content-between"
-							style={{ background: item.background }}>
-							<Link to={"/single/" + index}>
-								<span>Link to: {item.title}</span>
-							</Link>
-							{// Conditional render example
-							// Check to see if the background is orange, if so, display the message
-							item.background === "orange" ? (
-								<p style={{ color: item.initial }}>
-									Check store/flux.js scroll to the actions to see the code
-								</p>
-							) : null}
-							<button className="btn btn-success" onClick={() => actions.changeColor(index, "orange")}>
-								Change Color
-							</button>
-						</li>
-					);
-				})}
-			</ul>
-			<br />
-			<Link to="/">
-				<button className="btn btn-primary">Back home</button>
-			</Link>
+			<form onSubmit={handleSubmit}>
+				<div className="mb-3">
+					<label htmlFor="name" className="form-label">Name</label>
+					<input type="text" name="name" value={formData.name} onChange={handleChange} className="form-control" placeholder="Enter the name" required/>
+				</div>
+
+				<div className="mb-3">
+					<label htmlFor="address" className="form-label">Address</label>
+					<input type="text" name="address" value={formData.address} onChange={handleChange} className="form-control" placeholder="Enter the address"/>
+				</div>
+
+				<div className="mb-3">
+					<label htmlFor="phone" className="form-label">Phone</label>
+					<input type="text" name="phone" value={formData.phone} onChange={handleChange} className="form-control" placeholder="Enter the phone" required/>
+				</div>
+
+				<div className="mb-4">
+					<label htmlFor="email" className="form-label">Email</label>
+					<input type="email" name="email" value={formData.email} onChange={handleChange} className="form-control" placeholder="Enter the email"/>
+				</div>
+
+				<div className="d-grid gap-2 col-12">
+					<button className="btn btn-primary" type="submit">Save</button>
+				</div>
+			</form>
+			<Link to="/">or get back to contacts</Link>
 		</div>
 	);
 };
