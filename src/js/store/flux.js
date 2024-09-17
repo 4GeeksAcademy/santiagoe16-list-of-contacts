@@ -4,7 +4,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 			contacts: [],
 		},
 		actions: {
+			verifySlug: async () => {
+				
+				
+				const response = await fetch("https://playground.4geeks.com/contact/agendas?offset=0&limit=100");
+				const data = await response.json();
 			
+				const exists = data.agendas.some(agenda => agenda.slug === "santiagoe16");
+			
+				if (!exists) {
+
+					await fetch("https://playground.4geeks.com/contact/agendas/santiagoe16", {method: 'POST'});
+				}else{
+					getActions().getContacts()
+				}
+				 
+				 
+			},
+
 			getContacts: () => {
 				console.log("getcontacts")
 				fetch("https://playground.4geeks.com/contact/agendas/santiagoe16/contacts")
